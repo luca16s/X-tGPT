@@ -1,8 +1,16 @@
 ﻿using Azure;
 using Azure.AI.OpenAI;
 
-string apiKey = "";
-OpenAIClient client = new(apiKey, new OpenAIClientOptions());
+using Microsoft.Extensions.Configuration;
+
+var builder = new ConfigurationBuilder()
+            .AddUserSecrets<Program>();
+
+var configurationRoot = builder.Build();
+
+var apiKey = configurationRoot.GetSection("OpenAPIKey");
+
+OpenAIClient client = new(apiKey.Value, new OpenAIClientOptions());
 
 #region Texto
 string context = @"
