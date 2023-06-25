@@ -12,6 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatDividerModule } from '@angular/material/divider';
 
 @NgModule({
   declarations: [AppComponent],
@@ -29,6 +30,7 @@ import { MatRadioModule } from '@angular/material/radio';
     MatInputModule,
     MatButtonModule,
     MatRadioModule,
+    MatDividerModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

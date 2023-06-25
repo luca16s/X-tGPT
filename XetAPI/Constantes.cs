@@ -142,7 +142,7 @@
         public static string ERROR = "Não sei meu chapa.";
 
         public static string behavior = @"
-            Utilize o seguinte contexto para responder a subsequente questão.
+            Utilize o seguinte CONTEXTO para responder a subsequente questão.
 
             CONTEXTO:
             """"""
@@ -150,7 +150,7 @@
             """"""
 
             Somente responda perguntas que estão dentro do escopo do texto fornecido no CONTEXTO.
-            No caso da pergunta estar fora do escopo do contexto fornecido, escreva: ""{1}"".
+            No caso da pergunta estar fora do escopo do contexto fornecido, escreva somente a frase: ""{1}"".
         ";
     }
 }

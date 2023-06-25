@@ -38,6 +38,7 @@
 
             var chatCompletionsOptions = new ChatCompletionsOptions()
             {
+                Temperature = 0,
                 Messages =
                 {
                     chatBehavior,
@@ -60,11 +61,10 @@
                 {
                     sb.Append(message.Content);
                 }
+                sb.AppendLine();
             }
 
-            string retorno = sb.ToString();
-
-            return retorno.Contains("Não sei meu chapa.") ? Constantes.ERROR : retorno;
+            return sb.ToString();
         }
 
         public async Task<string> AskQuestionToCompletionsAsync(

@@ -39,6 +39,7 @@
 
 .chat {
   display: flex;
+  min-width: 100%;
   margin-top: auto;
   align-items: center;
   flex-direction: column;
@@ -83,4 +84,10 @@
   mat-icon {
     margin-right: 8px;
   }
+}
+
+.divider {
+  margin: 8px;
+  width: 100%;
+  border: 5px solid red;
 }
