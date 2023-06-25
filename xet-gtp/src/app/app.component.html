@@ -1,0 +1,48 @@
+<div class="left-container">
+  <div class="top">
+    <label>Tipo de Conversa</label>
+    <mat-radio-group [(ngModel)]="conversationType">
+      <mat-radio-button [value]="ConversationType.chatComContexto">Chat com Contexto</mat-radio-button>
+      <mat-radio-button [value]="ConversationType.chatSemContexto">Chat sem Contexto</mat-radio-button>
+      <mat-radio-button [value]="ConversationType.completionsComContexto">Completions com Contexto</mat-radio-button>
+      <mat-radio-button [value]="ConversationType.completionsSemContexto">Completions sem Contexto</mat-radio-button>
+    </mat-radio-group>
+  </div>
+  <div class="bottom">
+    <label>Tipo do Contexto da Conversa</label>
+    <mat-radio-group [(ngModel)]="contextType">
+      <mat-radio-button [value]="ContextType.json">JSON</mat-radio-button>
+      <mat-radio-button [value]="ContextType.text">Texto</mat-radio-button>
+    </mat-radio-group>
+  </div>
+</div>
+
+<div class="main-container">
+  <div class="chat">
+    <div class="cabecalho" *ngFor="let dialogue of conversations">
+      <div class="conversa">
+        <mat-icon>
+          account_circle
+        </mat-icon>
+        <span>
+          {{ dialogue?.question }}
+        </span>
+      </div>
+      <div class="conversa">
+        <mat-icon>
+          account_circle
+        </mat-icon>
+        <span>
+          {{ dialogue?.answer }}
+        </span>
+      </div>
+    </div>
+  </div>
+  <div class="caixa-comentario">
+    <textarea matInput class="input-comentarios" wrap="hard" maxlength="4000" matAutosizeMinRows="5"
+      matAutosizeMaxRows="5" [(ngModel)]="comentario">
+      {{ comentario }}
+    </textarea>
+    <button mat-raised-button color="accent" (click)="onSendQuestion()">Perguntar</button>
+  </div>
+</div>
