@@ -139,6 +139,8 @@
             ]
         ";
 
+        public static string ERROR = "Não sei meu chapa.";
+
         public static string behavior = @"
             Utilize o seguinte contexto para responder a subsequente questão.
 
@@ -148,7 +150,7 @@
             """"""
 
             Somente responda perguntas que estão dentro do escopo do texto fornecido no CONTEXTO.
-            No caso da pergunta estar fora do escopo do contexto fornecido, escreva: ""Não sei meu chapa."".
+            No caso da pergunta estar fora do escopo do contexto fornecido, escreva: ""{1}"".
         ";
     }
 }

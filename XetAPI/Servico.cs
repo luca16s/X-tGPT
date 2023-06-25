@@ -20,15 +20,15 @@
             bool shouldUseBehavior = true
         )
         {
-            var behavior = string.Empty;
+            var behavior = string.Format(Constantes.behavior, Constantes.JSON, Constantes.ERROR);
 
             switch (model.Context)
             {
                 case EContext.JSON:
-                    behavior = string.Format(Constantes.behavior, Constantes.JSON);
+                    behavior = string.Format(Constantes.behavior, Constantes.JSON, Constantes.ERROR);
                     break;
                 case EContext.TEXT:
-                    behavior = string.Format(Constantes.behavior, Constantes.TEXT);
+                    behavior = string.Format(Constantes.behavior, Constantes.TEXT, Constantes.ERROR);
                     break;
             }
 
@@ -52,17 +52,19 @@
 
             using StreamingChatCompletions streamingChatCompletions = response.Value;
 
-            StringBuilder retorno = new();
+            StringBuilder sb = new();
 
             await foreach (StreamingChatChoice choice in streamingChatCompletions.GetChoicesStreaming())
             {
                 await foreach (ChatMessage message in choice.GetMessageStreaming())
                 {
-                    retorno.Append(message.Content);
+                    sb.Append(message.Content);
                 }
             }
 
-            return retorno.ToString();
+            string retorno = sb.ToString();
+
+            return retorno.Contains("Não sei meu chapa.") ? Constantes.ERROR : retorno;
         }
 
         public async Task<string> AskQuestionToCompletionsAsync(
