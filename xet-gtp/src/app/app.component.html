@@ -4,8 +4,8 @@
     <mat-radio-group [(ngModel)]="conversationType">
       <mat-radio-button [value]="ConversationType.chatComContexto">Chat com Contexto</mat-radio-button>
       <mat-radio-button [value]="ConversationType.chatSemContexto">Chat sem Contexto</mat-radio-button>
-      <mat-radio-button [value]="ConversationType.completionsComContexto">Completions com Contexto</mat-radio-button>
-      <mat-radio-button [value]="ConversationType.completionsSemContexto">Completions sem Contexto</mat-radio-button>
+      <!-- <mat-radio-button [value]="ConversationType.completionsComContexto">Completions com Contexto</mat-radio-button>
+      <mat-radio-button [value]="ConversationType.completionsSemContexto">Completions sem Contexto</mat-radio-button> -->
     </mat-radio-group>
   </div>
   <div class="bottom">
@@ -30,7 +30,7 @@
       </div>
       <div class="conversa">
         <mat-icon>
-          account_circle
+          robot
         </mat-icon>
         <span>
           {{ dialogue?.answer }}
