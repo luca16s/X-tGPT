@@ -1,5 +1,4 @@
-﻿using Azure;
-using Azure.AI.OpenAI;
+﻿using Azure.AI.OpenAI;
 
 using Microsoft.Extensions.Configuration;
 
@@ -166,43 +165,54 @@ string behavior = @$"
 ";
 
 #region Embbeding
-//EmbeddingsOptions embeddingOptions = new(context);
-//var embedding = client.GetEmbeddings("text-embedding-ada-002", embeddingOptions);
+EmbeddingsOptions embeddingOptions = new(json);
+var embedding = client.GetEmbeddings("text-embedding-ada-002", embeddingOptions);
+using (FileStream file = File.Create(@$"C:\Users\lucag\source\repos\luca16s\{Guid.NewGuid()}"))
+{
+    using (StreamWriter writer = new(file))
+    {
+        foreach (float value in embedding.Value.Data[0].Embedding)
+        {
+            writer.Write(value);
+        }
+    }
+}
+Console.ReadLine();
 #endregion
 
 #region Chat
-var chatCompletionsOptions = new ChatCompletionsOptions()
-{
-    Messages =
-    {
-        new ChatMessage(ChatRole.System, behavior),
-        new ChatMessage(ChatRole.User, "Quem é Michael Jackson?"),// Funciona
-        //new ChatMessage(ChatRole.User, "Who is Michael Jackson?"),// Funciona
-        //new ChatMessage(ChatRole.User, "Is there a well called blue shark?"),// Funciona
-        //new ChatMessage(ChatRole.User, "Is there a well called blue whale?"),// Funciona
-        //new ChatMessage(ChatRole.User, "Existe um poço chamado Baleia Azul?"),// Funciona
-        //new ChatMessage(ChatRole.User, "Existe um poço chamado Tubarão Azul?"),// Funciona
-        //new ChatMessage(ChatRole.User, "Qual o tamanho do poço Baleia Jubarte?"),// Funciona
-        //new ChatMessage(ChatRole.User, "Qual a data de início do poço Baleia Azul?"),// Funciona
-        //new ChatMessage(ChatRole.User, "Converte esses dados em uma tabela?"),// Funciona
-    }
-};
+//var chatCompletionsOptions = new ChatCompletionsOptions()
+//{
+//    Messages =
+//    {
+//        new ChatMessage(ChatRole.System, behavior),
+//        new ChatMessage(ChatRole.User, "Quem é Michael Jackson?"),// Funciona
+//        //new ChatMessage(ChatRole.User, "Who is Michael Jackson?"),// Funciona
+//        //new ChatMessage(ChatRole.User, "Is there a well called blue shark?"),// Funciona
+//        //new ChatMessage(ChatRole.User, "Is there a well called blue whale?"),// Funciona
+//        //new ChatMessage(ChatRole.User, "Existe um poço chamado Baleia Azul?"),// Funciona
+//        //new ChatMessage(ChatRole.User, "Existe um poço chamado Tubarão Azul?"),// Funciona
+//        //new ChatMessage(ChatRole.User, "Qual o tamanho do poço Baleia Jubarte?"),// Funciona
+//        //new ChatMessage(ChatRole.User, "Qual a data de início do poço Baleia Azul?"),// Funciona
+//        //new ChatMessage(ChatRole.User, "Converte esses dados em uma tabela?"),// Funciona
+//    }
+//};
 
-Response<StreamingChatCompletions> response = await client.GetChatCompletionsStreamingAsync(
-    deploymentOrModelName: "gpt-3.5-turbo",
-    chatCompletionsOptions
-);
+//Response<StreamingChatCompletions> response = await client.GetChatCompletionsStreamingAsync(
+//    deploymentOrModelName: "gpt-3.5-turbo",
+//    chatCompletionsOptions
+//);
 
-using StreamingChatCompletions streamingChatCompletions = response.Value;
+//using StreamingChatCompletions streamingChatCompletions = response.Value;
 
-await foreach (StreamingChatChoice choice in streamingChatCompletions.GetChoicesStreaming())
-{
-    await foreach (ChatMessage message in choice.GetMessageStreaming())
-    {
-        Console.Write(message.Content);
-    }
-    Console.WriteLine();
-}
+//await foreach (StreamingChatChoice choice in streamingChatCompletions.GetChoicesStreaming())
+//{
+//    await foreach (ChatMessage message in choice.GetMessageStreaming())
+//    {
+//        Console.Write(message.Content);
+//    }
+//    Console.WriteLine();
+//}
 #endregion
 
 #region Completions

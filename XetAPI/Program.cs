@@ -3,7 +3,6 @@ namespace XetAPI
 {
     using Azure.AI.OpenAI;
 
-    using Microsoft.AspNetCore.Http.HttpResults;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Configuration;
 

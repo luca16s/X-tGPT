@@ -5,6 +5,7 @@
 
     using System.Text;
     using System.Threading.Tasks;
+
     using XetAPI.Model;
 
     public class Servico
@@ -20,15 +21,15 @@
             bool shouldUseBehavior = true
         )
         {
-            var behavior = string.Format(Constantes.behavior, Constantes.JSON, Constantes.ERROR);
+            var behavior = string.Format(Constantes.BEHAVIOR, Constantes.JSON, Constantes.ERROR, Constantes.SAIDA);
 
             switch (model.Context)
             {
                 case EContext.JSON:
-                    behavior = string.Format(Constantes.behavior, Constantes.JSON, Constantes.ERROR);
+                    behavior = string.Format(Constantes.BEHAVIOR, Constantes.JSON, Constantes.ERROR, Constantes.SAIDA);
                     break;
                 case EContext.TEXT:
-                    behavior = string.Format(Constantes.behavior, Constantes.TEXT, Constantes.ERROR);
+                    behavior = string.Format(Constantes.BEHAVIOR, Constantes.TEXT, Constantes.ERROR, Constantes.SAIDA);
                     break;
             }
 
@@ -65,6 +66,9 @@
             }
 
             return sb.ToString();
+
+            // Formatar uma resposta de forma específica
+            // campo informando se estava ou não no contexto
         }
 
         public async Task<string> AskQuestionToCompletionsAsync(
@@ -73,7 +77,7 @@
         )
         {
             var completionOptions = shouldUseBehavior ?
-                new CompletionsOptions { User = $"{Constantes.behavior} - {model.Question}?" } :
+                new CompletionsOptions { User = $"{Constantes.BEHAVIOR} - {model.Question}?" } :
                 new CompletionsOptions { User = $"{model.Question}?" };
 
             Response<Completions> completionsResponse = await client.GetCompletionsAsync(

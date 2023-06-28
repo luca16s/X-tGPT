@@ -2,7 +2,7 @@
 {
     public class Constantes
     {
-        public static string TEXT = @"
+        public const string TEXT = @"
             Nome do poço: Baleia Azul
             Data de Início: 01/02/2019
             Data de Fim: 15/11/2024
@@ -63,8 +63,8 @@
             Tamanho do Poço: 3.1 milhões de barris
             Localização: Mar do Norte
         ";
-
-        public static string JSON = @"
+               
+        public const string JSON = @"
             [
               {
                 ""Nome do poço"": ""Baleia Azul"",
@@ -138,10 +138,12 @@
               }
             ]
         ";
-
-        public static string ERROR = "Não sei meu chapa.";
-
-        public static string behavior = @"
+               
+        public const string ERROR = "Não sei meu chapa";
+               
+        public const string SAIDA = @"{ ""mensagem"": string, ""onContext"": boolean }";
+               
+        public const string BEHAVIOR = @"
             Utilize o seguinte CONTEXTO para responder a subsequente questão.
 
             CONTEXTO:
@@ -151,6 +153,10 @@
 
             Somente responda perguntas que estão dentro do escopo do texto fornecido no CONTEXTO.
             No caso da pergunta estar fora do escopo do contexto fornecido, escreva somente a frase: ""{1}"".
+
+            Formate esta saída como: {2} onde o campo mensagem é a resposta fornecida
+            e o campo onContext é preenchido como verdadeiro caso esteja no contexto e
+            falso caso não esteja no contexto.
         ";
     }
 }
