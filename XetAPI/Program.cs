@@ -76,6 +76,13 @@ namespace XetAPI
                 return model;
             });
 
+            app.MapPost("emb", async ([FromBody] ConversationModel model) =>
+            {
+                await servico.GetEmb(model);
+
+                return model;
+            });
+
             app.Run();
         }
     }

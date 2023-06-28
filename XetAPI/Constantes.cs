@@ -151,12 +151,15 @@
             {0}
             """"""
 
-            Somente responda perguntas que estão dentro do escopo do texto fornecido no CONTEXTO.
-            No caso da pergunta estar fora do escopo do contexto fornecido, escreva somente a frase: ""{1}"".
+            Princípio:
+             - Não justifique sua resposta
+             - Somente responda se a resposta puder ser encontrada no contexto
+        "
+        ;
 
-            Formate esta saída como: {2} onde o campo mensagem é a resposta fornecida
-            e o campo onContext é preenchido como verdadeiro caso esteja no contexto e
-            falso caso não esteja no contexto.
-        ";
-    }
+        //Instruções:
+        //    - Somente responda perguntas que estão dentro do escopo do texto fornecido no CONTEXTO.
+        //    - Caso a pergunta esteja fora do contexto responda: { 1}
+        //    - Formate a saída como: {2}
+}
 }
