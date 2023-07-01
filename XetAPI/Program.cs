@@ -7,6 +7,7 @@ namespace XetAPI
     using Microsoft.Extensions.Configuration;
 
     using XetAPI.Model;
+    using XetAPI.Model.Classification;
 
     public class Program
     {
@@ -81,6 +82,25 @@ namespace XetAPI
                 await servico.GetEmb(model);
 
                 return model;
+            });
+
+            app.MapPost("classify", async ([FromBody] ConversationModel model) =>
+            {
+                var classification = new ClassificationModel
+                {
+                    Question = model.Question,
+                    Pipeline = "zero-shot-classification",
+                    Labels = new string[] { "outros", "petróleo" },
+                    Model = "MoritzLaurer/mDeBERTa-v3-base-mnli-xnli",
+                };
+
+                var questionClassification = await servico.GetClassification(classification);
+
+                classification.Question = await servico.AskQuestionToChatAsync(model);
+
+                var answerClassification = await servico.GetClassification(classification);
+
+                return string.Empty;
             });
 
             app.Run();

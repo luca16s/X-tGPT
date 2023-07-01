@@ -5,26 +5,35 @@
     using Azure;
     using Azure.AI.OpenAI;
 
+    using System.Net.Http.Headers;
     using System.Text;
     using System.Threading.Tasks;
 
     using XetAPI.Model;
+    using XetAPI.Model.Classification;
 
     public class Servico
     {
-        private readonly OpenAIClient client;
+        private readonly OpenAIClient aiClient;
         private static float[]? embeddingContext;
+        private readonly HttpClient client = new();
 
         public Servico(
-            OpenAIClient client
-        ) => this.client = client;
+            OpenAIClient aiClient
+        )
+        {
+
+            this.aiClient = aiClient;
+            client.BaseAddress = new Uri("http://localhost:5000/api/v1/");
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        }
 
         public async Task<string> AskQuestionToChatAsync(
             ConversationModel model,
             bool shouldUseBehavior = true
         )
         {
-            var behavior = string.Format(Constantes.BEHAVIOR, Constantes.JSON, Constantes.ERROR, Constantes.SAIDA);
+            string behavior = string.Format(Constantes.BEHAVIOR, Constantes.JSON, Constantes.ERROR, Constantes.SAIDA);
 
             switch (model.Context)
             {
@@ -52,7 +61,7 @@
                 }
             };
 
-            Response<StreamingChatCompletions> response = await client.GetChatCompletionsStreamingAsync(
+            Response<StreamingChatCompletions> response = await aiClient.GetChatCompletionsStreamingAsync(
                 deploymentOrModelName: "gpt-3.5-turbo",
                 chatCompletionsOptions
             );
@@ -71,9 +80,6 @@
             }
 
             return sb.ToString();
-
-            // Formatar uma resposta de forma específica
-            // campo informando se estava ou não no contexto
         }
 
         public async Task<string> AskQuestionToCompletionsAsync(
@@ -85,7 +91,7 @@
                 new CompletionsOptions { User = $"{Constantes.BEHAVIOR} - {model.Question}?" } :
                 new CompletionsOptions { User = $"{model.Question}?" };
 
-            Response<Completions> completionsResponse = await client.GetCompletionsAsync(
+            Response<Completions> completionsResponse = await aiClient.GetCompletionsAsync(
                 "text-davinci-003",
                 completionOptions
             );
@@ -102,12 +108,12 @@
         {
             model.Question = $"{model.Question}. Não justifique sua resposta. Somente me dê informações precisas e mencionadas no contexto.";
             EmbeddingsOptions embeddingOptionsQuestion = new(model.Question);
-            var embeddingQuestion = client.GetEmbeddings("text-embedding-ada-002", embeddingOptionsQuestion).Value.Data[0].Embedding.ToArray();
+            var embeddingQuestion = aiClient.GetEmbeddings("text-embedding-ada-002", embeddingOptionsQuestion).Value.Data[0].Embedding.ToArray();
 
             if (embeddingContext is null)
             {
                 EmbeddingsOptions embeddingOptionsContext = new(Constantes.TEXT);
-                embeddingContext = client.GetEmbeddings("text-embedding-ada-002", embeddingOptionsContext).Value.Data[0].Embedding.ToArray();
+                embeddingContext = aiClient.GetEmbeddings("text-embedding-ada-002", embeddingOptionsContext).Value.Data[0].Embedding.ToArray();
             }
 
             var cos = new Cosine();
@@ -120,7 +126,7 @@
             var retorno = await AskQuestionToChatAsync(model, true);
 
             EmbeddingsOptions embeddingOptionsResposta = new(retorno);
-            var embeddingResposta = client.GetEmbeddings("text-embedding-ada-002", embeddingOptionsResposta).Value.Data[0].Embedding.ToArray();
+            var embeddingResposta = aiClient.GetEmbeddings("text-embedding-ada-002", embeddingOptionsResposta).Value.Data[0].Embedding.ToArray();
 
             var similarityRespostaContexto = cos.Similarity(
                 embeddingResposta.Select(x => (double)x).ToArray(),
@@ -135,6 +141,15 @@
             Console.WriteLine("---------");
 
             return;
+        }
+
+        public async Task<ClassificationResponse?> GetClassification(ClassificationModel model)
+        {
+            HttpResponseMessage response = await client.PostAsJsonAsync("classify", model);
+
+            return response.IsSuccessStatusCode ?
+                response.Content.ReadAsAsync<ClassificationResponse>().Result :
+                null;
         }
     }
 }

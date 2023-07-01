@@ -14,8 +14,6 @@ RUN pip install --upgrade pip
 
 RUN pip install flask
 
-RUN pip install marshmallow
-
 RUN curl --proto '=https' --tlsv1.2 -y -sSf https://sh.rustup.rs | sh
 
 ENV PATH="/root/.cargo/bin:${PATH}"
@@ -34,4 +32,4 @@ WORKDIR /app
 
 COPY . .
 
-CMD ["python3", "app/index.py"]
+CMD ["python3", "app/main.py"]
