@@ -8,6 +8,7 @@ namespace XetAPI
 
     using XetAPI.Model;
     using XetAPI.Model.Classification;
+    using XetAPI.Model.Embedding;
 
     public class Program
     {
@@ -15,7 +16,7 @@ namespace XetAPI
 
         public static void Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
+            WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
             builder.Configuration.AddUserSecrets<Program>();
             builder.Services.AddControllers();
@@ -33,7 +34,7 @@ namespace XetAPI
                     });
             });
 
-            var app = builder.Build();
+            WebApplication app = builder.Build();
 
             if (app.Environment.IsDevelopment())
             {
@@ -45,9 +46,9 @@ namespace XetAPI
             app.UseAuthorization();
             app.UseHttpsRedirection();
 
-            var apiKey = app.Configuration.GetSection("OpenAPIKey");
+            IConfigurationSection apiKey = app.Configuration.GetSection("OpenAPIKey");
             OpenAIClient client = new(apiKey.Value, new OpenAIClientOptions());
-            var servico = new Servico(client);
+            Servico servico = new(client);
 
             app.MapPost("chat-com-contexto", async ([FromBody] ConversationModel model) =>
             {
@@ -84,9 +85,43 @@ namespace XetAPI
                 return model;
             });
 
-            app.MapPost("classify", async ([FromBody] ConversationModel model) =>
+            app.MapPost("local", async ([FromBody] ConversationModel model) =>
             {
-                var classification = new ClassificationModel
+                model.Answer = "4.2 milhões de barris\r\n";
+
+                EmbeddingModel embAnswerModel = new()
+                {
+                    Model = "sentence-transformers/all-MiniLM-L6-v2",
+                    Texts = new List<string>
+                    {
+                        model.Answer
+                    }
+                };
+                EmbeddingModel embContextModel = new()
+                {
+                    Model = "sentence-transformers/all-MiniLM-L6-v2",
+                    Texts = new List<string>
+                    {
+                        Constantes.TEXT
+                    }
+                };
+                EmbeddingModel embQuestionModel = new()
+                {
+                    Model = "sentence-transformers/all-MiniLM-L6-v2",
+                    Texts = new List<string>
+                    {
+                        model.Question
+                    }
+                };
+
+                EmbeddingResponse? embAnswerResult = await servico.GetEmbeddings(embAnswerModel);
+                EmbeddingResponse? embContextResult = await servico.GetEmbeddings(embContextModel);
+                EmbeddingResponse? embQuestionResult = await servico.GetEmbeddings(embQuestionModel);
+
+                double cosSimilarityAnswer = servico.GetCosSimilarity(embContextResult, embAnswerResult);
+                double cosSimilarityQuestion = servico.GetCosSimilarity(embContextResult, embQuestionResult);
+
+                ClassificationModel classificationModel = new()
                 {
                     Question = model.Question,
                     Pipeline = "zero-shot-classification",
@@ -94,13 +129,19 @@ namespace XetAPI
                     Model = "MoritzLaurer/mDeBERTa-v3-base-mnli-xnli",
                 };
 
-                var questionClassification = await servico.GetClassification(classification);
+                ClassificationResponse? questionClassification = await servico.GetClassification(classificationModel);
+                ClassificationResponse? answerClassification = await servico.GetClassification(classificationModel);
 
-                classification.Question = await servico.AskQuestionToChatAsync(model);
+                Console.WriteLine("/local");
+                Console.WriteLine("---------");
+                Console.WriteLine(model.Question);
+                Console.WriteLine($"Similarity: {cosSimilarityQuestion} - Classification: {questionClassification?.Labels[0]}");
+                Console.WriteLine("---------");
+                Console.WriteLine(model.Answer);
+                Console.WriteLine($"Similarity: {cosSimilarityAnswer} - Classification: {answerClassification?.Labels[0]}");
+                Console.WriteLine("---------");
 
-                var answerClassification = await servico.GetClassification(classification);
-
-                return string.Empty;
+                return model;
             });
 
             app.Run();

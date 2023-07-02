@@ -151,9 +151,9 @@
             {0}
             """"""
 
-            Princípio:
-             - Não justifique sua resposta
-             - Somente responda se a resposta puder ser encontrada no contexto
+            Princípios:
+             - Não justifique sua resposta.
+             - Somente responda caso a resposta esteja inserida no contexto.
         "
         ;
 

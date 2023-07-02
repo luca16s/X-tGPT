@@ -11,6 +11,7 @@
 
     using XetAPI.Model;
     using XetAPI.Model.Classification;
+    using XetAPI.Model.Embedding;
 
     public class Servico
     {
@@ -45,11 +46,11 @@
                     break;
             }
 
-            var chatBehavior = shouldUseBehavior ?
+            ChatMessage chatBehavior = shouldUseBehavior ?
                 new ChatMessage(ChatRole.System, behavior) :
                 new ChatMessage(ChatRole.System, string.Empty);
 
-            var chatCompletionsOptions = new ChatCompletionsOptions()
+            ChatCompletionsOptions chatCompletionsOptions = new()
             {
                 Temperature = 0,
                 PresencePenalty = 2,
@@ -87,7 +88,7 @@
             bool shouldUseBehavior = true
         )
         {
-            var completionOptions = shouldUseBehavior ?
+            CompletionsOptions completionOptions = shouldUseBehavior ?
                 new CompletionsOptions { User = $"{Constantes.BEHAVIOR} - {model.Question}?" } :
                 new CompletionsOptions { User = $"{model.Question}?" };
 
@@ -108,7 +109,7 @@
         {
             model.Question = $"{model.Question}. Não justifique sua resposta. Somente me dê informações precisas e mencionadas no contexto.";
             EmbeddingsOptions embeddingOptionsQuestion = new(model.Question);
-            var embeddingQuestion = aiClient.GetEmbeddings("text-embedding-ada-002", embeddingOptionsQuestion).Value.Data[0].Embedding.ToArray();
+            float[] embeddingQuestion = aiClient.GetEmbeddings("text-embedding-ada-002", embeddingOptionsQuestion).Value.Data[0].Embedding.ToArray();
 
             if (embeddingContext is null)
             {
@@ -116,26 +117,29 @@
                 embeddingContext = aiClient.GetEmbeddings("text-embedding-ada-002", embeddingOptionsContext).Value.Data[0].Embedding.ToArray();
             }
 
-            var cos = new Cosine();
+            Cosine cos = new();
 
-            var similarityPerguntaContexto = cos.Similarity(
+            double similarityPerguntaContexto = 
+                cos.Similarity(
                 embeddingQuestion.Select(x => (double)x).ToArray(),
                 embeddingContext.Select(x => (double)x).ToArray()
             );
 
-            var retorno = await AskQuestionToChatAsync(model, true);
+            string retorno = await AskQuestionToChatAsync(model, true);
 
             EmbeddingsOptions embeddingOptionsResposta = new(retorno);
-            var embeddingResposta = aiClient.GetEmbeddings("text-embedding-ada-002", embeddingOptionsResposta).Value.Data[0].Embedding.ToArray();
+            float[] embeddingResposta = aiClient.GetEmbeddings("text-embedding-ada-002", embeddingOptionsResposta).Value.Data[0].Embedding.ToArray();
 
-            var similarityRespostaContexto = cos.Similarity(
+            double similarityRespostaContexto = cos.Similarity(
                 embeddingResposta.Select(x => (double)x).ToArray(),
                 embeddingContext.Select(x => (double)x).ToArray()
             );
 
+            Console.WriteLine("/emb");
             Console.WriteLine("---------");
             Console.WriteLine(model.Question);
             Console.WriteLine(similarityPerguntaContexto);
+            Console.WriteLine("---------");
             Console.WriteLine(retorno);
             Console.WriteLine(similarityRespostaContexto);
             Console.WriteLine("---------");
@@ -143,13 +147,40 @@
             return;
         }
 
-        public async Task<ClassificationResponse?> GetClassification(ClassificationModel model)
+        public double GetCosSimilarity(EmbeddingResponse? emb1, EmbeddingResponse? emb2)
         {
-            HttpResponseMessage response = await client.PostAsJsonAsync("classify", model);
+            return emb1 == null || emb2 == null ?
+                -1 :
+                new Cosine()
+                .Similarity(
+                    emb1.Response,
+                    emb2.Response
+                );
+        }
+
+        public async Task<ClassificationResponse?> GetClassification(ClassificationModel classification)
+        {
+            HttpResponseMessage response = await client.PostAsJsonAsync("classify", classification);
 
             return response.IsSuccessStatusCode ?
                 response.Content.ReadAsAsync<ClassificationResponse>().Result :
                 null;
+        }
+
+        public async Task<EmbeddingResponse?> GetEmbeddings(EmbeddingModel embedding)
+        {
+            HttpResponseMessage response = await client.PostAsJsonAsync("embeddings", embedding);
+
+            List<List<string>> result = await response.Content.ReadAsAsync<List<List<string>>>();
+
+            if (result == null || result.Count == 0)
+                return new EmbeddingResponse { Response = new List<double>().ToArray() };
+
+            var embList = result.SelectMany(x => x.ToList()).ToList();
+
+            return embList.Select(double.Parse).ToList() is not List<double> embArray ?
+                new EmbeddingResponse { Response = new List<double>().ToArray() } :
+                new EmbeddingResponse { Response = embArray.ToArray() };
         }
     }
 }

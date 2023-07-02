@@ -2,12 +2,12 @@
 
 using Microsoft.Extensions.Configuration;
 
-var builder = new ConfigurationBuilder()
+IConfigurationBuilder builder = new ConfigurationBuilder()
             .AddUserSecrets<Program>();
 
-var configurationRoot = builder.Build();
+IConfigurationRoot configurationRoot = builder.Build();
 
-var apiKey = configurationRoot.GetSection("OpenAPIKey");
+IConfigurationSection apiKey = configurationRoot.GetSection("OpenAPIKey");
 
 OpenAIClient client = new(apiKey.Value, new OpenAIClientOptions());
 
@@ -166,7 +166,7 @@ string behavior = @$"
 
 #region Embbeding
 EmbeddingsOptions embeddingOptions = new(json);
-var embedding = client.GetEmbeddings("text-embedding-ada-002", embeddingOptions);
+Azure.Response<Embeddings> embedding = client.GetEmbeddings("text-embedding-ada-002", embeddingOptions);
 using (FileStream file = File.Create(@$"C:\Users\lucag\source\repos\luca16s\{Guid.NewGuid()}"))
 {
     using (StreamWriter writer = new(file))
