@@ -118,6 +118,7 @@ namespace XetAPI
                 EmbeddingResponse? embContextResult = await servico.GetEmbeddings(embContextModel);
                 EmbeddingResponse? embQuestionResult = await servico.GetEmbeddings(embQuestionModel);
 
+                double cosSimilarity = servico.GetCosSimilarity(embQuestionResult, embAnswerResult);
                 double cosSimilarityAnswer = servico.GetCosSimilarity(embContextResult, embAnswerResult);
                 double cosSimilarityQuestion = servico.GetCosSimilarity(embContextResult, embQuestionResult);
 
@@ -139,6 +140,8 @@ namespace XetAPI
                 Console.WriteLine("---------");
                 Console.WriteLine(model.Answer);
                 Console.WriteLine($"Similarity: {cosSimilarityAnswer} - Classification: {answerClassification?.Labels[0]}");
+                Console.WriteLine("---------");
+                Console.WriteLine($"Similarity entre Pergunta e Resposta: {cosSimilarity}");
                 Console.WriteLine("---------");
 
                 return model;
