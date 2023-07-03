@@ -58,7 +58,7 @@
                 Messages =
                 {
                     chatBehavior,
-                    new ChatMessage(ChatRole.User, model.Question),
+                    new ChatMessage(ChatRole.User, $"{model.Question}. Não justifique sua resposta. Somente me dê informações precisas e mencionadas no contexto."),
                 }
             };
 

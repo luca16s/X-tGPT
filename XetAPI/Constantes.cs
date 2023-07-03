@@ -151,9 +151,10 @@
             {0}
             """"""
 
-            Princípios:
-             - Não justifique sua resposta.
-             - Somente responda caso a resposta esteja inserida no contexto.
+            Instruções:
+              - Somente responda perguntas que estão dentro do escopo do texto fornecido no CONTEXTO.
+              - Caso a pergunta esteja fora do contexto responda: {1}
+              - Formate a saída como: {2}
         "
         ;
 
