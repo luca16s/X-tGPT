@@ -88,10 +88,12 @@ namespace XetAPI
             app.MapPost("local", async ([FromBody] ConversationModel model) =>
             {
                 model.Answer = "4.2 milhões de barris\r\n";
+                //"sentence-transformers/all-MiniLM-L6-v2"
+                var embeddingModelName = "clips/mfaq";
 
                 EmbeddingModel embAnswerModel = new()
                 {
-                    Model = "sentence-transformers/all-MiniLM-L6-v2",
+                    Model = embeddingModelName,
                     Texts = new List<string>
                     {
                         model.Answer
@@ -99,7 +101,7 @@ namespace XetAPI
                 };
                 EmbeddingModel embContextModel = new()
                 {
-                    Model = "sentence-transformers/all-MiniLM-L6-v2",
+                    Model = embeddingModelName,
                     Texts = new List<string>
                     {
                         Constantes.TEXT
@@ -107,7 +109,7 @@ namespace XetAPI
                 };
                 EmbeddingModel embQuestionModel = new()
                 {
-                    Model = "sentence-transformers/all-MiniLM-L6-v2",
+                    Model = embeddingModelName,
                     Texts = new List<string>
                     {
                         model.Question
